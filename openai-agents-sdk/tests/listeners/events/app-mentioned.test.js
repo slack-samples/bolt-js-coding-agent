@@ -1,8 +1,6 @@
 import assert from 'node:assert';
 import { afterEach, beforeEach, describe, it } from 'node:test';
 
-import { setTracingDisabled } from '@openai/agents';
-
 import { RunOutcome } from '../../../agent/outcome.js';
 import { CodeChannelSession, sessionStore } from '../../../agent/sessions.js';
 import { createCodeChannel } from '../../../agent/tools/index.js';
@@ -10,9 +8,6 @@ import { runs } from '../../../agent/turns.js';
 import { handleAppMentioned } from '../../../listeners/events/app-mentioned.js';
 import { allArgs, answer, codeChannelInfo, fakeClient, fakeContext, forgetSessions, lastArgs } from '../../helpers.js';
 import { invoke } from '../../invoke.js';
-
-// Tests never reach OpenAI, so there are no traces to send.
-setTracingDisabled(true);
 
 describe('handleAppMentioned', () => {
   /** @type {any} */

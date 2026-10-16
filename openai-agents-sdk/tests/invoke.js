@@ -1,4 +1,7 @@
-import { RunContext } from '@openai/agents';
+import { RunContext, setTracingDisabled } from '@openai/agents';
+
+// Tests never reach OpenAI, so there are no traces to send.
+setTracingDisabled(true);
 
 /**
  * Call a tool the way a run does, with `deps` as its context.
