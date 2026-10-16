@@ -1,1 +1,16 @@
-export { addEmojiReaction } from './emoji-reaction.js';
+export { archiveChannel } from './archive-channel.js';
+export { cloneRepo } from './clone-repo.js';
+export { createCodeChannel } from './create-code-channel.js';
+export { editFile } from './edit-file.js';
+export { listViews } from './list-views.js';
+export { publishDiff } from './publish-diff.js';
+export { publishHtmlView } from './publish-html-view.js';
+export { readFile } from './read-file.js';
+export { readPlan } from './read-plan.js';
+export { removeView } from './remove-view.js';
+export { renameSession } from './rename-session.js';
+export { runCommand } from './run-command.js';
+export { setCommands } from './set-commands.js';
+export { setContextBar } from './set-context-bar.js';
+export { writeFile } from './write-file.js';
+export { writePlan } from './write-plan.js';

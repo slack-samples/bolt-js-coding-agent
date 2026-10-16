@@ -1,6 +1,3 @@
-# Build
-.bolt-js-build/
-
 # Claude Code
 .claude/*.local.json
 

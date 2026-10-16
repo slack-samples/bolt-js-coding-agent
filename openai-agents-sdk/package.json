@@ -1,10 +1,10 @@
 {
-  "name": "bolt-js-starter-agent-openai",
+  "name": "bolt-js-coding-agent-openai",
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "check": "npx tsc --checkJs --noEmit --skipLibCheck --esModuleInterop --target esnext --module nodenext --moduleResolution nodenext app.js",
+    "check": "npx tsc --checkJs --noEmit --skipLibCheck --esModuleInterop --target esnext --module nodenext --moduleResolution nodenext app.js app-oauth.js",
     "start": "node app.js",
     "lint": "npx @biomejs/biome check .",
     "lint:fix": "npx @biomejs/biome check --write .",
@@ -13,7 +13,9 @@
   "dependencies": {
     "@openai/agents": "^0.20.0",
     "@slack/bolt": "^5.1.0",
-    "dotenv": "~18.0.7"
+    "@slack/web-api": "^8.2.0",
+    "dotenv": "~18.0.7",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",

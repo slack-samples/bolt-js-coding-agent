@@ -1,78 +1,189 @@
-import { Agent, MCPServerStreamableHttp, run } from '@openai/agents';
+/**
+ * The OpenAI Agents SDK side of the coding agent.
+ *
+ * Everything that touches the SDK lives here, in `agent/guardrails.js`, and in
+ * `agent/tools/`. The turn handling in `agent/turns.js` calls only `runRequest`,
+ * which returns the reply text, and `startRun` and `resumeRun`, which return a
+ * `RunOutcome`.
+ */
 
-import { addEmojiReaction } from './tools/index.js';
+import { Agent, run } from '@openai/agents';
 
-const SYSTEM_PROMPT = `\
-You are a friendly Slack assistant. You help people by answering questions, \
-having conversations, and being generally useful in Slack.
+import { RunOutcome } from './outcome.js';
+import { REQUEST_PROMPT, SYSTEM_PROMPT } from './prompts.js';
+import {
+  archiveChannel,
+  cloneRepo,
+  createCodeChannel,
+  editFile,
+  listViews,
+  publishDiff,
+  publishHtmlView,
+  readFile,
+  readPlan,
+  removeView,
+  renameSession,
+  runCommand,
+  setCommands,
+  setContextBar,
+  writeFile,
+  writePlan,
+} from './tools/index.js';
 
-## PERSONALITY
-- Friendly, helpful, and approachable
-- Lightly witty — a touch of humor when appropriate, but never forced
-- Concise and clear — respect people's time
-- Confident but honest when you don't know something
+/** @typedef {import('./sessions.js').AgentDeps} AgentDeps */
+/** @typedef {import('./sessions.js').RequestDeps} RequestDeps */
 
-## RESPONSE GUIDELINES
-- Keep responses to 3 sentences max — be punchy, scannable, and actionable
-- End with a clear next step on its own line so it's easy to spot
-- Use a bullet list only for multi-step instructions
-- Use casual, conversational language
-- Use emoji sparingly — at most one per message, and only to set tone
+// Model calls allowed per turn. Coding work reads several files before editing,
+// so this is well above the SDK's default of 10.
+export const MAX_TURNS = 50;
 
-## FORMATTING RULES
-- Use standard Markdown syntax: **bold**, _italic_, \`code\`, \`\`\`code blocks\`\`\`, > blockquotes
-- Use bullet points for multi-step instructions
+// Drop the oldest conversation when a long session outgrows the model's
+// context window, rather than failing every turn after that.
+/** @type {import('@openai/agents').ModelSettings} */
+const MODEL_SETTINGS = { truncation: 'auto' };
 
-## EMOJI REACTIONS
-Always react to every user message with \`add_emoji_reaction\` before responding. \
-Pick any Slack emoji that reflects the *topic* or *tone* of the message — be creative and specific \
-(e.g. \`dog\` for dog topics, \`books\` for learning, \`wave\` for greetings). \
-Vary your picks across a thread; don't repeat the same emoji.
+/**
+ * The SDK's handle on a run paused for approval, passed back to `resumeRun`.
+ * @typedef {Object} PausedRun
+ * @property {import('@openai/agents').RunState<any, any>} state
+ * @property {import('@openai/agents').RunToolApprovalItem} item
+ */
 
-## SLACK MCP SERVER
-You may have access to the Slack MCP Server, which gives you powerful Slack tools \
-beyond your built-in tools. Use them whenever they would help the user.
+export const requestAgent = new Agent({
+  name: 'Coding Agent',
+  instructions: REQUEST_PROMPT,
+  tools: [createCodeChannel],
+  // End the request once a code channel exists, since the work continues there.
+  toolUseBehavior: (context) => {
+    const deps = /** @type {RequestDeps} */ (context.context);
+    return deps.codeChannelId !== null
+      ? { isFinalOutput: true, isInterrupted: undefined, finalOutput: '' }
+      : { isFinalOutput: false, isInterrupted: undefined };
+  },
+  model: 'gpt-6-luna',
+  modelSettings: MODEL_SETTINGS,
+});
 
-Available capabilities:
-- **Search**: Search messages and files across public channels, search for channels by name
-- **Read**: Read channel message history, read thread replies, read canvas documents
-- **Write**: Send messages, create draft messages, schedule messages for later
-- **Canvases**: Create, read, and update Slack canvas documents
-
-Use these tools when they can help answer a question or complete a task — for example, \
-searching for relevant messages, checking a channel for context, or creating a canvas. \
-Also use them when the user explicitly asks you to perform a Slack action.`;
-
-const SLACK_MCP_URL = 'https://mcp.slack.com/mcp';
-
-export const starterAgent = new Agent({
-  name: 'Starter Agent',
+export const agent = new Agent({
+  name: 'Coding Agent',
   instructions: SYSTEM_PROMPT,
-  tools: [addEmojiReaction],
-  model: 'gpt-4.1-mini',
+  tools: [
+    cloneRepo,
+    readFile,
+    writeFile,
+    editFile,
+    runCommand,
+    publishDiff,
+    setContextBar,
+    writePlan,
+    readPlan,
+    publishHtmlView,
+    listViews,
+    removeView,
+    setCommands,
+    renameSession,
+    archiveChannel,
+  ],
+  // End the turn once the channel is archived, since nothing more can be posted.
+  toolUseBehavior: (context) => {
+    const deps = /** @type {AgentDeps} */ (context.context);
+    return deps.session.archived
+      ? { isFinalOutput: true, isInterrupted: undefined, finalOutput: '' }
+      : { isFinalOutput: false, isInterrupted: undefined };
+  },
+  model: 'gpt-6.1-sol',
+  modelSettings: MODEL_SETTINGS,
 });
 
 /**
- * Run the agent, optionally connecting to the Slack MCP server.
- * @param {string | import('@openai/agents').AgentInputItem[]} inputItems
- * @param {import('./deps.js').AgentDeps} deps
- * @returns {Promise<import('@openai/agents').RunResult<any, any>>}
+ * Turn a run result into a RunOutcome, detecting a pending approval.
+ * @param {import('@openai/agents').RunResult<any, any>} result
+ * @returns {RunOutcome}
  */
-export async function runAgent(inputItems, deps) {
-  if (deps.userToken) {
-    const mcpServer = new MCPServerStreamableHttp({
-      url: SLACK_MCP_URL,
-      requestInit: { headers: { Authorization: `Bearer ${deps.userToken}` } },
-    });
-
-    try {
-      await mcpServer.connect();
-      const agentWithMcp = starterAgent.clone({ mcpServers: [mcpServer] });
-      return await run(agentWithMcp, inputItems, { context: deps });
-    } finally {
-      await mcpServer.close();
+export function settle(result) {
+  const history = [...result.history];
+  const interruptions = result.interruptions;
+  if (interruptions.length > 0) {
+    // The history ends with calls still waiting on approval. Give each one
+    // an output so the history stays valid if the run is stopped or replaced
+    // instead of resumed. A resumed run replaces this history with its own.
+    for (const item of interruptions) {
+      const call = /** @type {import('@openai/agents').protocol.FunctionCallItem} */ (item.rawItem);
+      history.push({
+        type: 'function_call_result',
+        name: call.name,
+        callId: call.callId,
+        status: 'completed',
+        output: "Not run. The user didn't approve this command.",
+      });
     }
+    // One command at a time keeps the sample's approval UX simple.
+    const item = interruptions[0];
+    // The SDK gives the tool call's arguments as a JSON string.
+    const args = JSON.parse(item.arguments || '{}');
+    return new RunOutcome({
+      paused: /** @type {PausedRun} */ ({ state: result.state, item }),
+      command: args.command ?? '',
+      history,
+    });
   }
+  return new RunOutcome({ finalOutput: result.finalOutput ?? null, history });
+}
 
-  return await run(starterAgent, inputItems, { context: deps });
+/**
+ * End a turn that used every model call with a message, keeping its history.
+ * @returns {import('@openai/agents').RunErrorHandlerResult<any>}
+ */
+export function outOfTurns() {
+  return {
+    finalOutput:
+      `I used all ${MAX_TURNS} steps I get in one turn before finishing. ` +
+      "Send a message and I'll pick up where I left off.",
+    includeInHistory: true,
+  };
+}
+
+/**
+ * Reply to a request outside a code channel, or create one for it via the tool.
+ * @param {string} prompt
+ * @param {RequestDeps} deps
+ * @returns {Promise<string | null>}
+ */
+export async function runRequest(prompt, deps) {
+  const result = await run(requestAgent, prompt, { context: deps });
+  return result.finalOutput ?? null;
+}
+
+/**
+ * Start an agent turn. May complete, or pause awaiting command approval.
+ * @param {any[]} history
+ * @param {string} text
+ * @param {AgentDeps} deps
+ * @returns {Promise<RunOutcome>}
+ */
+export async function startRun(history, text, deps) {
+  const result = await run(agent, [...history, { role: 'user', content: text }], {
+    context: deps,
+    maxTurns: MAX_TURNS,
+    errorHandlers: { maxTurns: outOfTurns },
+  });
+  return settle(result);
+}
+
+/**
+ * Resume a paused run with the user's decision on its pending command.
+ * @param {PausedRun} paused
+ * @param {boolean} approved
+ * @param {AgentDeps} _deps - The run's deps travel with its state.
+ * @returns {Promise<RunOutcome>}
+ */
+export async function resumeRun(paused, approved, _deps) {
+  if (approved) {
+    paused.state.approve(paused.item);
+  } else {
+    paused.state.reject(paused.item, { message: 'The user denied running this command.' });
+  }
+  // The paused state carries the run's context, turn count, and MAX_TURNS with it.
+  const result = await run(agent, paused.state, { errorHandlers: { maxTurns: outOfTurns } });
+  return settle(result);
 }

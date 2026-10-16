@@ -1,4 +1,4 @@
-import { handleFeedbackButton } from './feedback-buttons.js';
+import { handleApprovalButtons } from './approval-buttons.js';
 
 /**
  * Register action listeners with the Bolt app.
@@ -6,5 +6,6 @@ import { handleFeedbackButton } from './feedback-buttons.js';
  * @returns {void}
  */
 export function register(app) {
-  app.action('feedback', handleFeedbackButton);
+  app.action('approve_command', handleApprovalButtons);
+  app.action('deny_command', handleApprovalButtons);
 }

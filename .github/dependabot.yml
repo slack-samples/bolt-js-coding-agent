@@ -3,13 +3,18 @@ updates:
   - package-ecosystem: "npm"
     directories:
       - "/openai-agents-sdk"
-      - "/claude-agent-sdk"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    cooldown:
+      default-days: 7
+      exclude:
+        - "@slack/*"
     labels:
       - "npm"
       - "dependencies"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    cooldown:
+      default-days: 7

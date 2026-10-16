@@ -9,12 +9,14 @@ const app = new App({
   appToken: process.env.SLACK_APP_TOKEN,
   socketMode: true,
   logLevel: LogLevel.DEBUG,
-  ignoreSelf: false,
+  clientOptions: {
+    slackApiUrl: process.env.SLACK_API_URL || 'https://slack.com/api/',
+  },
 });
 
 registerListeners(app);
 
 (async () => {
   await app.start();
-  app.logger.info('Starter Agent is running!');
+  app.logger.info('Coding Agent is running!');
 })();
