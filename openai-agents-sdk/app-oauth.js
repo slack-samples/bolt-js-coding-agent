@@ -1,13 +1,8 @@
 import 'dotenv/config';
 
-import { readFileSync } from 'node:fs';
-
 import { App, FileInstallationStore, LogLevel } from '@slack/bolt';
 
 import { registerListeners } from './listeners/index.js';
-
-const manifest = JSON.parse(readFileSync('manifest.json', 'utf-8'));
-const botScopes = manifest.oauth_config.scopes.bot;
 
 const app = new App({
   logLevel: LogLevel.DEBUG,
@@ -15,7 +10,21 @@ const app = new App({
   clientId: process.env.SLACK_CLIENT_ID,
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: process.env.SLACK_STATE_SECRET,
-  scopes: botScopes,
+  scopes: [
+    'app_mentions:read',
+    'assistant:write',
+    'canvases:write',
+    'channels:history',
+    'channels:read',
+    'chat:write',
+    'code_channels:manage',
+    'groups:history',
+    'groups:read',
+    'im:history',
+    'im:read',
+    'im:write',
+    'mpim:history',
+  ],
   installationStore: new FileInstallationStore({ baseDir: './data/installations' }),
   installerOptions: {
     stateVerification: true,
