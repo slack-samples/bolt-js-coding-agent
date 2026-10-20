@@ -2,9 +2,8 @@ import fs from 'node:fs';
 
 import { tool } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
-
+import { toolResult } from '../runtime.js';
 import { resolvePath } from '../workspace.js';
-import { toolResult } from './tool-result.js';
 
 // Enough to read most source files whole, without one file crowding the turn.
 const MAX_CHARS = 20000;

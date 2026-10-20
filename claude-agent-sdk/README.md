@@ -341,6 +341,8 @@ The `sessions.js` file keeps each code channel's session in memory: its working 
 
 The `approvals.js` file decides which commands need approval and holds runs paused on one.
 
+The `runtime.js` file holds what the tools share during a run: the shape of a tool's reply.
+
 The `workspace.js` file splits and runs commands in the clone without the app's secrets, and keeps file tools inside it.
 
 The `tools` directory contains one file per tool the agents can call. Each exports a function of the run's deps that returns the tool, since the SDK calls a tool with only its arguments.

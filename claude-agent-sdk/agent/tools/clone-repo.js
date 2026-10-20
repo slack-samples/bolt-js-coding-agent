@@ -4,9 +4,8 @@ import path from 'node:path';
 
 import { tool } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
-
+import { toolResult } from '../runtime.js';
 import { CommandTimeoutError, run } from '../workspace.js';
-import { toolResult } from './tool-result.js';
 
 // Cap the clone so an unreachable or huge repository can't wedge the session.
 const CLONE_TIMEOUT_SECONDS = 120;

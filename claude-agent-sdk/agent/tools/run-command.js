@@ -11,9 +11,8 @@ import fs from 'node:fs';
 
 import { tool } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
-
+import { toolResult } from '../runtime.js';
 import { CommandTimeoutError, clip, resolvePath, run, splitCommand } from '../workspace.js';
-import { toolResult } from './tool-result.js';
 
 // Cap any single command so a hung/looping command can't wedge the session.
 const COMMAND_TIMEOUT_SECONDS = 120;

@@ -1,7 +1,7 @@
 import { tool } from '@anthropic-ai/claude-agent-sdk';
 import { WebAPIPlatformError } from '@slack/web-api';
 
-import { toolResult } from './tool-result.js';
+import { toolResult } from '../runtime.js';
 
 /** @param {import('../sessions.js').AgentDeps} deps */
 export const readPlan = (deps) =>

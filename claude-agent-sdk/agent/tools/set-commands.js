@@ -2,7 +2,7 @@ import { tool } from '@anthropic-ai/claude-agent-sdk';
 import { WebAPIPlatformError } from '@slack/web-api';
 import { z } from 'zod';
 
-import { toolResult } from './tool-result.js';
+import { toolResult } from '../runtime.js';
 
 const Command = z.object({
   name: z.string().describe('The command name without a leading slash, such as `run-tests`. 1–31 characters.'),

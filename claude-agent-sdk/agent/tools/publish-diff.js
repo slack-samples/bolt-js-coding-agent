@@ -2,9 +2,8 @@ import fs from 'node:fs';
 
 import { tool } from '@anthropic-ai/claude-agent-sdk';
 import { WebAPIPlatformError } from '@slack/web-api';
-
+import { toolResult } from '../runtime.js';
 import { run } from '../workspace.js';
-import { toolResult } from './tool-result.js';
 
 /** @param {import('../sessions.js').AgentDeps} deps */
 export const publishDiff = (deps) =>

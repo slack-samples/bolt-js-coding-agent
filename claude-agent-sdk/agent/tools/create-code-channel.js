@@ -2,7 +2,7 @@ import { tool } from '@anthropic-ai/claude-agent-sdk';
 import { WebAPIPlatformError } from '@slack/web-api';
 import { z } from 'zod';
 
-import { toolResult } from './tool-result.js';
+import { toolResult } from '../runtime.js';
 
 /** @param {import('../sessions.js').RequestDeps} deps */
 export const createCodeChannel = (deps) =>

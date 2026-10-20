@@ -3,9 +3,8 @@ import nodePath from 'node:path';
 
 import { tool } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
-
+import { toolResult } from '../runtime.js';
 import { resolvePath } from '../workspace.js';
-import { toolResult } from './tool-result.js';
 
 /** @param {import('../sessions.js').AgentDeps} deps */
 export const writeFile = (deps) =>
