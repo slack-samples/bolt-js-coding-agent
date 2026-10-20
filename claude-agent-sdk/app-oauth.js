@@ -9,32 +9,6 @@ import { registerListeners } from './listeners/index.js';
 const manifest = JSON.parse(readFileSync('manifest.json', 'utf-8'));
 const botScopes = manifest.oauth_config.scopes.bot;
 
-// ---------------------------------------------------------------------------
-// Installation store with bot-token fallback
-// ---------------------------------------------------------------------------
-// When installed via Slack CLI, SLACK_BOT_TOKEN is available but Bolt clears
-// it when OAuth options are present. This wrapper lets the bot token serve as
-// a fallback so the app works before anyone has completed the OAuth flow.
-
-const fileStore = new FileInstallationStore({ baseDir: './data/installations' });
-const fallbackBotToken = process.env.SLACK_BOT_TOKEN;
-
-/** @type {import('@slack/bolt').InstallationStore} */
-const installationStore = {
-  storeInstallation: async (installation) => fileStore.storeInstallation(installation),
-  fetchInstallation: async (query) => {
-    try {
-      return await fileStore.fetchInstallation(query);
-    } catch {
-      if (fallbackBotToken) {
-        return /** @type {any} */ ({ bot: { token: fallbackBotToken } });
-      }
-      throw new Error('No installation found and no fallback bot token configured');
-    }
-  },
-  deleteInstallation: async (query) => fileStore.deleteInstallation(query),
-};
-
 const app = new App({
   logLevel: LogLevel.DEBUG,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -42,7 +16,7 @@ const app = new App({
   clientSecret: process.env.SLACK_CLIENT_SECRET,
   stateSecret: process.env.SLACK_STATE_SECRET,
   scopes: botScopes,
-  installationStore,
+  installationStore: new FileInstallationStore({ baseDir: './data/installations' }),
   installerOptions: {
     stateVerification: true,
   },
