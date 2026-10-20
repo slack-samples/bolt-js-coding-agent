@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         directory:
+          - claude-agent-sdk
           - openai-agents-sdk
     defaults:
       run:
