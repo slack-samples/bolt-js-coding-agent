@@ -293,7 +293,7 @@ npm test
 
 ### `app.js`
 
-`app.js` is the entry point for the application and is the file you'll run to start the server. This project aims to keep this file as thin as possible, primarily using it as a way to route inbound requests. It runs Bolt's `App` in Socket Mode, which handles each event as it arrives, so a long agent turn never holds up the stop button, an approval click, or another channel, and agent slash commands are routed to it without a `slash_command_url`.
+`app.js` is the entry point for the application and is the file you'll run to start the server. This project aims to keep this file as thin as possible, primarily using it as a way to route inbound requests. It runs Bolt's `App` in Socket Mode, so a long agent turn never holds up the stop button, an approval click, or another channel, and agent slash commands are routed to it without a `slash_command_url`.
 
 ### `app-oauth.js`
 
