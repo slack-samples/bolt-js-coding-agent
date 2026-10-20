@@ -205,12 +205,14 @@ slack install -E local
    - Run `slack app settings` to open App Settings
    - Copy **Client ID**, **Client Secret**, and **Signing Secret**
    - Update `SLACK_REDIRECT_URI` with your ngrok domain
+   - Set `SLACK_STATE_SECRET` to a random string, which signs the OAuth state
 
 ```sh
 SLACK_CLIENT_ID=YOUR_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
 SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
 SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
+SLACK_STATE_SECRET=YOUR_STATE_SECRET
 ```
 
 6. Start the app:
@@ -229,7 +231,7 @@ slack run app-oauth.js
 
 3. Create your Slack app at [api.slack.com/apps/new](https://api.slack.com/apps/new) using [`manifest.json`](./manifest.json). Before pasting the manifest, set `socket_mode_enabled` to `false` and replace `ngrok-free.app` with your ngrok domain.
 
-4. Copy the following values from _Basic Information_ into your `.env`:
+4. Copy the following values from _Basic Information_ into your `.env`, and set `SLACK_STATE_SECRET` to a random string, which signs the OAuth state:
    - **Signing Secret**
    - **Client ID** and **Client Secret**
 
@@ -238,6 +240,7 @@ SLACK_CLIENT_ID=YOUR_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
 SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
 SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
+SLACK_STATE_SECRET=YOUR_STATE_SECRET
 ```
 
 5. Start the app:
