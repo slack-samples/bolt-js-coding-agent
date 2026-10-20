@@ -10,5 +10,3 @@
 # Slack CLI
 */.slack/apps.json
 */.slack/apps.dev.json
-*/.slack/cache/
-*/.slack/config.json
