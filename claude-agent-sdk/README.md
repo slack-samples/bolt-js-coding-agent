@@ -206,13 +206,11 @@ slack install -E local
 5. Update your `.env` OAuth environment variables:
    - Run `slack app settings` to open App Settings
    - Copy **Client ID**, **Client Secret**, and **Signing Secret**
-   - Update `SLACK_REDIRECT_URI` with your ngrok domain
    - Set `SLACK_STATE_SECRET` to a random string, which signs the OAuth state
 
 ```sh
 SLACK_CLIENT_ID=YOUR_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
-SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
 SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
 SLACK_STATE_SECRET=YOUR_STATE_SECRET
 ```
@@ -240,7 +238,6 @@ slack run app-oauth.js
 ```sh
 SLACK_CLIENT_ID=YOUR_CLIENT_ID
 SLACK_CLIENT_SECRET=YOUR_CLIENT_SECRET
-SLACK_REDIRECT_URI=https://YOUR_NGROK_SUBDOMAIN.ngrok-free.app/slack/oauth_redirect
 SLACK_SIGNING_SECRET=YOUR_SIGNING_SECRET
 SLACK_STATE_SECRET=YOUR_STATE_SECRET
 ```
@@ -255,7 +252,7 @@ node app-oauth.js
 
 </details>
 
-> **Note:** Each time ngrok restarts, it generates a new URL. You'll need to update the ngrok domain in `manifest.json`, `SLACK_REDIRECT_URI` in your `.env`, and re-install the app.
+> **Note:** Each time ngrok restarts, it generates a new URL. You'll need to update the ngrok domain in `manifest.json` and re-install the app.
 
 </details>
 

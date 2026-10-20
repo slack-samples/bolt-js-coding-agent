@@ -9,7 +9,7 @@ import path from 'node:path';
 // Environment variables kept from the app's environment are everything except
 // the app's own tokens and anything that looks like a credential, so they aren't
 // passed to a command from the repository.
-const SECRET_PREFIXES = ['ANTHROPIC_', 'OPENAI_', 'SLACK_'];
+const SECRET_PREFIXES = ['ANTHROPIC_', 'SLACK_'];
 const SECRET_MARKERS = ['API_KEY', 'CREDENTIAL', 'PASSWORD', 'PRIVATE_KEY', 'SECRET', 'TOKEN'];
 
 // git never waits on a prompt or an editor, since nobody can answer one.

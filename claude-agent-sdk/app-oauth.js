@@ -38,8 +38,6 @@ const installationStore = {
   deleteInstallation: async (query) => fileStore.deleteInstallation(query),
 };
 
-// Agent slash commands arrive at the manifest's `code_channels.slash_command_url`,
-// which points at the same /slack/events endpoint as events and actions.
 const app = new App({
   logLevel: LogLevel.DEBUG,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -62,8 +60,4 @@ registerListeners(app);
   const port = Number.parseInt(process.env.PORT || '3000', 10);
   await app.start(port);
   app.logger.info(`Coding Agent is running on port ${port}!`);
-  if (process.env.SLACK_REDIRECT_URI) {
-    const origin = new URL(process.env.SLACK_REDIRECT_URI).origin;
-    app.logger.info(`Install the app: ${origin}/slack/install`);
-  }
 })();
