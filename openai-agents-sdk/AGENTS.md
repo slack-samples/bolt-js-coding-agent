@@ -2,6 +2,10 @@
 
 Guidance for coding agents working in this directory. Refer to the root `../AGENTS.md` for repository-wide structure and commands.
 
+## Slack plugin
+
+To install the Slack plugin for your coding agent, follow [Claude Code, Codex, Cursor, and Other Coding Agents](./README.md#claude-code-codex-cursor-and-other-coding-agents) in the README.
+
 ## OpenAI Agents SDK specifics
 
 **Agents (`agent/agent.js`)** are two `Agent`s with pinned models: a routing `requestAgent` (`gpt-6-luna`) whose only tool is `create_code_channel`, and the coding `agent` (`gpt-6.1-sol`) with every other tool. Tools are `tool()` definitions with zod parameters, one per file under `agent/tools/`, that read the run context (`AgentDeps` or `RequestDeps`, both in `agent/sessions.js`) for the Slack client and session. Optional arguments are `.nullable()`, since the SDK's strict schemas require every field. Both agents set `modelSettings: { truncation: 'auto' }`, so a long session drops its oldest conversation instead of outgrowing the context window.
