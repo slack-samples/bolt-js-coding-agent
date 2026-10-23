@@ -11,6 +11,10 @@ A monorepo for a **Coding Agent** sample for Slack, built with Bolt for JavaScri
 
 Implementations share a structure and user experience, not code. Keep each one obvious on its own, written in its framework's idiom, rather than adding shared helpers.
 
+## Slack plugin
+
+To install the Slack plugin for your coding agent, follow [Claude Code, Codex, Cursor, and Other Coding Agents](./README.md#claude-code-codex-cursor-and-other-coding-agents) in the README.
+
 ## Commands
 
 Run these from inside an implementation directory, such as `openai-agents-sdk/`:
@@ -33,6 +37,8 @@ npm test
 ## Code style
 
 ES modules with kebab-case filenames, JSDoc types checked by `tsc --checkJs`, Biome for linting and formatting (single quotes, 2-space indent, 120 line width), and Node's built-in test runner.
+
+No code comments. Make the code explain itself with clear names, tests, or types. Put the reason for a change in the PR description.
 
 ## Repository structure
 
