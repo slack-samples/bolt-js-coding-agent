@@ -21,22 +21,22 @@ The coding agent works like this:
 
 Each code channel method is a tool the model calls when it decides to, in [`agent/tools/`](./agent/tools/), one file per tool. The tools are served to the model by an in-process MCP server, so it sees each one as `mcp__coding-agent__<name>`:
 
-| Tool | Method |
-| --- | --- |
-| `create_code_channel` | `agents.conversations.create` |
-| `set_context_bar` | `agents.conversations.setProperties` |
-| `publish_diff` | `agents.conversations.setView` (`diff`) |
-| `publish_html_view` | `agents.conversations.setView` (`html`) |
-| `write_plan` | `canvases.create` + `agents.conversations.setView` (`canvas`), then `agents.conversations.setCanvasContent` |
-| `read_plan` | `agents.conversations.getCanvas` |
-| `list_views` | `agents.conversations.listViews` |
-| `remove_view` | `agents.conversations.removeView` |
-| `set_commands` | `agents.conversations.setCommands` |
-| `rename_session` | `agents.sessions.rename` |
-| `archive_channel` | `chat.postMessage` + `agents.sessions.setStatus` (`closed`) + `agents.conversations.archive` |
-| `clone_repo` | Local `git clone` into a temp directory |
-| `read_file`, `write_file`, `edit_file` | Local files in that directory |
-| `run_command` | A local program in that directory, run without a shell |
+| Tool                                   | Method                                                                                                      |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `create_code_channel`                  | `agents.conversations.create`                                                                               |
+| `set_context_bar`                      | `agents.conversations.setProperties`                                                                        |
+| `publish_diff`                         | `agents.conversations.setView` (`diff`)                                                                     |
+| `publish_html_view`                    | `agents.conversations.setView` (`html`)                                                                     |
+| `write_plan`                           | `canvases.create` + `agents.conversations.setView` (`canvas`), then `agents.conversations.setCanvasContent` |
+| `read_plan`                            | `agents.conversations.getCanvas`                                                                            |
+| `list_views`                           | `agents.conversations.listViews`                                                                            |
+| `remove_view`                          | `agents.conversations.removeView`                                                                           |
+| `set_commands`                         | `agents.conversations.setCommands`                                                                          |
+| `rename_session`                       | `agents.sessions.rename`                                                                                    |
+| `archive_channel`                      | `chat.postMessage` + `agents.sessions.setStatus` (`closed`) + `agents.conversations.archive`                |
+| `clone_repo`                           | Local `git clone` into a temp directory                                                                     |
+| `read_file`, `write_file`, `edit_file` | Local files in that directory                                                                               |
+| `run_command`                          | A local program in that directory, run without a shell                                                      |
 
 ### Code channel behavior
 
