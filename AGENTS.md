@@ -48,7 +48,7 @@ claude-agent-sdk/    # Claude Agent SDK implementation
 openai-agents-sdk/   # OpenAI Agents SDK implementation
 ```
 
-CI runs Biome, the type check, and the tests against each directory with a matrix in `.github/workflows/lint.yml` and `.github/workflows/tests.yml`. The lint job also checks the root files with the root `biome.json`, which skips both directories: run `npx --prefix claude-agent-sdk biome check .` from the root to do the same. Dependabot watches each directory separately. When adding an implementation, add its directory to both workflow matrices, to `.github/dependabot.yml`, and to the framework table in the root `README.md`.
+CI runs Biome, the type check, and the tests against each directory with a matrix in `.github/workflows/lint.yml` and `.github/workflows/tests.yml`. The lint job also checks the root files with the root `biome.json`, which skips both directories: run `claude-agent-sdk/node_modules/.bin/biome check .` from the root to do the same. Dependabot watches each directory separately. When adding an implementation, add its directory to both workflow matrices, to `.github/dependabot.yml`, and to the framework table in the root `README.md`.
 
 ## Architecture
 
